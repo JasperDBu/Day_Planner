@@ -2,13 +2,14 @@ package dayplanner;
 
 /**
  * Represents an activity that occurs at
- * a specific locat on.
+ * a specific location.
  *
  * An OtherActivity contains a title,
  * start time, end time, optional comment,
  * and location.
  *
  * @author Jasper Bungay
+ * @version 1.0
  */
 public class OtherActivity {
     

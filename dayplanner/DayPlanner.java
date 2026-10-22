@@ -1,12 +1,29 @@
 package dayplanner;
 import java.util.Scanner;
 
+/**
+ * DayPlanner is a simple activity management
+ * application that allows users to add and
+ * search for Home, School, and Other activities.
+ *
+ * Activities are stored in fixed-size arrays and
+ * can be searched using keywords and time ranges.
+ *
+ * The application uses a text-based menu system
+ * and stores all dates and times using a
+ * 24-hour clock.
+ *
+ * @author Jasper Bungay
+ * @version 1.0
+ */
 public class DayPlanner {
     public final static int MAX_ARRAY_LEN = 10; 
 
     public static HomeActivity[] HomeActivities = new HomeActivity[MAX_ARRAY_LEN];
     public static SchoolActivity[] SchoolActivities = new SchoolActivity[MAX_ARRAY_LEN];
     public static OtherActivity[] OtherActivities = new OtherActivity[MAX_ARRAY_LEN];
+    
+    //Constants for the different activity type options in my code
     private static final int HOME = 1;
     private static final int SCHOOL = 2;
     private static final int OTHER = 3;
@@ -28,6 +45,8 @@ public class DayPlanner {
      *        3 = OtherActivity
      */
     public static void addActivity(int activityType){
+
+        //Getting Title
         System.out.println("Please input a title: ");
         String title = inScanner.nextLine().trim();
         if (title.isEmpty()){
@@ -35,6 +54,7 @@ public class DayPlanner {
             return;
         }
         
+        //Getting start time
         System.out.println("Please input a start time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
         String startTimeString = inScanner.nextLine().trim();
         Time startTime = parseTime(startTimeString);
@@ -43,6 +63,7 @@ public class DayPlanner {
             return;
         }
         
+        //Getting end time
         System.out.println("Please input an end time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
         String endTimeString = inScanner.nextLine().trim();
         Time endTime = parseTime(endTimeString);
@@ -50,6 +71,8 @@ public class DayPlanner {
             System.err.println("Error: inputed time is invalid");
             return;
         }
+
+        //checks if time range is impossible
         if( startTime.compareTo(endTime) > 0){
             System.err.println("Error: Invalid start and end times.");
             return;

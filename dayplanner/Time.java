@@ -8,6 +8,7 @@ package dayplanner;
  * comparison, and string formatting methods.
  *
  * @author Jasper Bungay
+ * @version 1.0
  */
 public class Time {
 
@@ -42,6 +43,7 @@ public class Time {
      *         stored date and time.
      */
     public long getTime(){
+        //formula to turn it into workable value for checks and comparisons
         long time = minute + (hour * 100) + (day * 10000) + (month * 1000000) + (year * 100000000);
         return time;
     }
@@ -101,9 +103,12 @@ public class Time {
      */
     public static boolean timeIsValid( int year, int month, int day, int hour, int minute){
         
+        // year check, month check, and time checks
         if(year < 1 || month < 1 || month > 12 || hour > 23 || hour < 0 || minute > 59 || minute < 0){
             return false;
         }
+
+        //Month checks, will do seperate things for day check depedning on the month or year.
         if(month == 2){
             if((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)){
                 if ( day > 29 || day < 1){

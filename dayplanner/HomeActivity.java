@@ -8,6 +8,7 @@ package dayplanner;
  * end time, and an optional comment.
  *
  * @author Jasper Bungay
+ * @version 1.0
  */
 public class HomeActivity {
 
