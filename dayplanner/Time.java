@@ -30,7 +30,7 @@ public class Time {
         } else if (thisTime > otherTime){
             return 1;
         }
-        return 0;
+        return -1;
     }
 
     public String toString(){ 
@@ -43,7 +43,7 @@ public class Time {
 
     public static boolean timeIsValid( int year, int month, int day, int hour, int minute){
         
-        if(year < 0 || month < 1 || month > 12 || hour > 23 || hour < 0 || minute > 59 || minute < 0){
+        if(year < 1 || month < 1 || month > 12 || hour > 23 || hour < 0 || minute > 59 || minute < 0){
             return false;
         }
         if(month == 4){
