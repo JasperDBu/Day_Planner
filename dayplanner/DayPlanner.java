@@ -7,6 +7,10 @@ public class DayPlanner {
     public static HomeActivity[] HomeActivities = new HomeActivity[MAX_ARRAY_LEN];
     public static SchoolActivity[] SchoolActivities = new SchoolActivity[MAX_ARRAY_LEN];
     public static OtherActivity[] OtherActivities = new OtherActivity[MAX_ARRAY_LEN];
+    private static final int HOME = 1;
+    private static final int SCHOOL = 2;
+    private static final int OTHER = 3;
+    private static final int ALL = 4;
 
     public static int homeCount = 0;
     public static int schoolCount = 0;
@@ -14,6 +18,15 @@ public class DayPlanner {
 
     public static Scanner inScanner = new Scanner(System.in);
 
+    /**
+     * Prompts the user for activity information and
+     * adds a new activity to the corresponding array.
+     *
+     * @param activityType
+     *        1 = HomeActivity
+     *        2 = SchoolActivity
+     *        3 = OtherActivity
+     */
     public static void addActivity(int activityType){
         System.out.println("Please input a title: ");
         String title = inScanner.nextLine().trim();
@@ -22,34 +35,39 @@ public class DayPlanner {
             return;
         }
         
-        System.out.println("Please input a start time (YYYY/MM/DD, HH:MM):");
+        System.out.println("Please input a start time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
         String startTimeString = inScanner.nextLine().trim();
         Time startTime = parseTime(startTimeString);
         if (startTime == null){
             System.err.println("Error: inputed time is invalid");
+            return;
         }
         
-        System.out.println("Please input an end time (YYYY/MM/DD, HH:MM):");
+        System.out.println("Please input an end time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
         String endTimeString = inScanner.nextLine().trim();
         Time endTime = parseTime(endTimeString);
         if (endTime == null){
             System.err.println("Error: inputed time is invalid");
+            return;
         }
-        if( startTime.compareTo(endTime) != 0){
+        if( startTime.compareTo(endTime) > 0){
             System.err.println("Error: Invalid start and end times.");
+            return;
         }
 
         System.out.println("(Optional) Please enter a comment.");
         String comment = inScanner.nextLine().trim();
 
         switch (activityType) {
-            case 1:
+            case HOME:
                 HomeActivities[homeCount] = new HomeActivity( title, startTime, endTime, comment);   
+                homeCount++;
                 break;
-            case 2:
+            case SCHOOL:
                 SchoolActivities[schoolCount] = new SchoolActivity( title, startTime, endTime, comment);
+                schoolCount++;
                 break;
-            case 3:
+            case OTHER:
                 System.out.println("Please enter a location: ");
                 String location = inScanner.nextLine().trim();
                 if (location.isEmpty()){
@@ -57,10 +75,19 @@ public class DayPlanner {
                     return;
                 }
                 OtherActivities[otherCount] = new OtherActivity( title, startTime, endTime, comment, location);
+                otherCount++;
                 break;
         }
     }
 
+    /**
+     * Converts a string in the format
+     * YYYY/MM/DD, HH:MM into a Time object.
+     *
+     * @param input Time string entered by the user.
+     * @return A valid Time object or null if
+     *         the format or values are invalid.
+     */
     public static Time parseTime(String input){ 
         int year;
         int month;
@@ -101,9 +128,188 @@ public class DayPlanner {
         return new Time( year, month, day, hour, minute);
     }
 
-    public static void searchActivity(){
-        
+    /**
+     * Searches activities matching the specified
+     * activity type, keywords, and time range.
+     *
+     * @param activityType
+     *        1 = HomeActivity
+     *        2 = SchoolActivity
+     *        3 = OtherActivity
+     *        4 = Search all activities
+     */
+    public static void searchActivity( int activityType){
+        System.out.println("Please enter keywords to search:");
+        String keyWords = inScanner.nextLine().trim().toLowerCase();
+
+        System.out.println("Please input a target start time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
+        String startTimeString = inScanner.nextLine().trim();
+        Time startTime = null;
+        if (startTimeString.isBlank()){
+            startTime = null;
+        } else {
+            startTime = parseTime(startTimeString);
+            if (startTime == null){
+                System.err.println("Error: inputed time is invalid");
+                return;
+            }
+        }
+
+        System.out.println("Please input a target end time (YYYY/MM/DD, HH:MM) Reminder 24 hour clock:");
+        String endTimeString = inScanner.nextLine().trim();
+        Time endTime = null;
+        if (endTimeString.isBlank()){
+            endTime = null;
+        } else {
+            endTime = parseTime(endTimeString);
+            if (endTime == null){
+                System.err.println("Error: inputed time is invalid");
+                return;
+            }
+        }
+
+        boolean found = false;
+        switch (activityType){
+            case HOME:
+                for(int i = 0; i < homeCount; i++){
+                    HomeActivity activity = HomeActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), "");
+                        found = true;
+                    }
+                }
+                break;
+            case SCHOOL:
+                for(int i = 0; i < schoolCount; i++){
+                    SchoolActivity activity = SchoolActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), "");
+                        found = true;
+                    }
+                }
+                break;
+            case OTHER:
+                for(int i = 0; i < otherCount; i++){
+                    OtherActivity activity = OtherActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), activity.getLocation());
+                        found = true;
+                    }
+                }
+                break;
+            case ALL:
+                for(int i = 0; i < homeCount; i++){
+                    HomeActivity activity = HomeActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        System.out.println("chec");
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), "");
+                        found = true;
+                    }
+                }
+                for(int i = 0; i < schoolCount; i++){
+                    SchoolActivity activity = SchoolActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), "");
+                        found = true;
+                    }
+                }
+                for(int i = 0; i < otherCount; i++){
+                    OtherActivity activity = OtherActivities[i];
+                    if (keyWordsMatch(activity.getTitle(), keyWords) && timeRangeMatch(activity.getStartTime(), activity.getEndTime(), startTime, endTime)){
+                        printActivity(activity.getTitle(), activity.getStartTime(), activity.getEndTime(), activity.getComment(), activity.getLocation());
+                        found = true;
+                    }
+                }
+                break;
+        }
+        if (!found){
+            System.out.println("No matching activities found.");
+        }
     }
+
+    /**
+     * Determines whether a title contains
+     * the specified search keywords.
+     *
+     * @param title Activity title.
+     * @param keyWords User search keywords.
+     * @return true if all search keywords are
+     *         present in the title, false otherwise.
+     */
+    public static boolean keyWordsMatch(String title, String keyWords){
+        if (keyWords.isEmpty()){
+            return true;
+        }
+
+        String targetWords[] = keyWords.split("[ ]+");
+        String titleWords[] = title.split("[ ]+");
+
+        for (String titleWord : titleWords){
+            boolean found = false;
+            for (String targetWord : targetWords){
+                if( targetWord.equalsIgnoreCase(titleWord)){
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether an activity falls
+     * within a searched time range.
+     *
+     * @param activityStartTime Activity start time.
+     * @param activityEndTime Activity end time.
+     * @param targetStartTime Search range start.
+     * @param targetEndTime Search range end.
+     *
+     * @return true if the activity satisfies
+     *         the search range constraints,
+     *         false otherwise.
+     */
+    public static boolean timeRangeMatch( Time activityStartTime, Time activityEndTime, Time targetStartTime, Time targetEndTime){
+        if (targetStartTime == null && targetEndTime == null){
+            return true;
+        } else if (targetStartTime == null){
+            if ( activityEndTime.compareTo(targetEndTime) <= 0){
+                return true;
+            }
+        } else if ( targetEndTime == null){
+            if (activityStartTime.compareTo(targetStartTime) >= 0){
+                return true;
+            }
+        } else if ( activityEndTime.compareTo(targetEndTime) <= 0 && activityStartTime.compareTo(targetStartTime) >= 0){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Prints the details of an activity.
+     *
+     * @param title Activity title.
+     * @param startTime Activity start time.
+     * @param endTime Activity end time.
+     * @param comment Activity comment.
+     * @param location Activity location,
+     *                 if applicable.
+     */
+    public static void printActivity( String title, Time startTime, Time endTime, String comment, String location){
+        System.out.println("\nTitle : " + title);
+        System.out.println("Time Range: " + startTime.toString() + " - " + endTime.toString());
+        System.out.println("Comment: " + comment);
+        if(!location.isBlank()){
+            System.out.println("Location: " + location);
+        }
+    }
+
 
 
     public static void main(String[] args) {
@@ -119,6 +325,8 @@ public class DayPlanner {
             String choice = inScanner.nextLine().toLowerCase().trim();
 
             switch (choice) {
+                case "a":
+                    // intentional fall through
                 case "add": {
                     System.out.println("Please enter the type of activity (home/school/other)");
                     String activityType = inScanner.nextLine().toLowerCase().trim();
@@ -128,7 +336,7 @@ public class DayPlanner {
                                 System.err.println("Error: HomeActivities is full.");
                                 break;
                             }
-                            addActivity(1);
+                            addActivity(HOME);
                             break;
 
                         case "school":
@@ -136,7 +344,7 @@ public class DayPlanner {
                                 System.err.println("Error: SchoolActivities is full.");
                                 break;
                             }
-                            addActivity(2);
+                            addActivity(HOME);
                             break;
 
                         case "other":
@@ -144,7 +352,7 @@ public class DayPlanner {
                                 System.err.println("Error: OtherActivities is full.");
                                 break;
                             }
-                            addActivity(3);
+                            addActivity(OTHER);
                             break;
 
                         default:
@@ -153,25 +361,27 @@ public class DayPlanner {
                     }
                     break;
                 }
+                case "s":
+                    // intentional fall through
                 case "search": {
                     System.out.println("Please enter the type of activity (home/school/other) or leave blank to search all activities.");
                     String activityType = inScanner.nextLine().toLowerCase().trim();
                     switch (activityType){
                         case "home":
-                            
+                            searchActivity(HOME);
                             break;
 
                         case "school":
-                        
+                            searchActivity(SCHOOL);
                             break;
 
                         case "other":
-                            
+                            searchActivity(OTHER);
                             break;
 
                         default:
                             if (activityType.isEmpty()){
-
+                                searchActivity(ALL);
                             } else {
                                 System.err.println("Error: inputed an invalid activity type");
                             }
@@ -180,7 +390,7 @@ public class DayPlanner {
                     break;
                 }
                 case "q":
-                    break;
+                    // intentional fall through
                 case "quit":
                     active = false;
                     break;

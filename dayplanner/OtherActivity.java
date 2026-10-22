@@ -1,5 +1,15 @@
 package dayplanner;
 
+/**
+ * Represents an activity that occurs at
+ * a specific locat on.
+ *
+ * An OtherActivity contains a title,
+ * start time, end time, optional comment,
+ * and location.
+ *
+ * @author Jasper Bungay
+ */
 public class OtherActivity {
     
     private String title;
@@ -16,22 +26,47 @@ public class OtherActivity {
         location = locationString;
     }
 
+    /**
+     * Retrieves the title of the activity.
+     *
+     * @return Activity title.
+     */
     public String getTitle(){
         return title;
     }
 
+    /**
+     * Retrieves the start time of the activity.
+     *
+     * @return Activity start time.
+     */
     public Time getStartTime(){
         return startTime;
     }
     
+    /**
+     * Retrieves the end time of the activity.
+     *
+     * @return Activity end time.
+     */
     public Time getEndTime(){
         return endTime;
     }
 
+    /**
+     * Retrieves the comment of the activity.
+     *
+     * @return Activity comment.
+     */
     public String getComment(){
         return comment;
     }
 
+    /**
+     * Retrieves the location of the activity.
+     *
+     * @return Activity location.
+     */
     public String getLocation(){
         return location;
     }
