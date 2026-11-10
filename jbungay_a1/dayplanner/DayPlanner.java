@@ -140,15 +140,11 @@ public class DayPlanner {
 
             hour = Integer.parseInt(timePieces[0].trim());
             minute = Integer.parseInt(timePieces[1].trim());
+
+            return new Time( year, month, day, hour, minute);
         } catch( Exception err) {
             return null;
         }
-
-        if (!Time.timeIsValid(year, month, day, hour, minute)){
-            return null;
-        }
-
-        return new Time( year, month, day, hour, minute);
     }
 
     /**

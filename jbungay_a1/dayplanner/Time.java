@@ -20,18 +20,145 @@ public class Time {
 
     /**
      * Creates a new Time object.
+     * Validates the date and time values before
+     * assigning them.
      *
      * @param year Year value.
      * @param month Month value (1-12).
      * @param day Day value.
      * @param hour Hour value (0-23).
      * @param minute Minute value (0-59).
+     * @throws IllegalArgumentException if the
+     *         date and time values are invalid.
      */
     public Time(int year, int month, int day, int hour, int minute){
+        if (!timeIsValid(year, month, day, hour, minute)){
+            throw new IllegalArgumentException("Invalid date/time values.");
+        }
         this.year = year;
         this.month = month;
         this.day = day;
         this.hour = hour;
+        this.minute = minute;
+    }
+
+    /**
+     * Retrieves the year.
+     *
+     * @return Year value.
+     */
+    public int getYear(){
+        return year;
+    }
+
+    /**
+     * Retrieves the month.
+     *
+     * @return Month value.
+     */
+    public int getMonth(){
+        return month;
+    }
+
+    /**
+     * Retrieves the day.
+     *
+     * @return Day value.
+     */
+    public int getDay(){
+        return day;
+    }
+
+    /**
+     * Retrieves the hour.
+     *
+     * @return Hour value.
+     */
+    public int getHour(){
+        return hour;
+    }
+
+    /**
+     * Retrieves the minute.
+     *
+     * @return Minute value.
+     */
+    public int getMinute(){
+        return minute;
+    }
+
+    /**
+     * Sets the year after validating the resulting
+     * date and time.
+     *
+     * @param year Year value.
+     * @throws IllegalArgumentException if the
+     *         resulting date/time would be invalid.
+     */
+    public void setYear(int year){
+        if (!timeIsValid(year, this.month, this.day, this.hour, this.minute)){
+            throw new IllegalArgumentException("Invalid year value.");
+        }
+        this.year = year;
+    }
+
+    /**
+     * Sets the month after validating the resulting
+     * date and time.
+     *
+     * @param month Month value.
+     * @throws IllegalArgumentException if the
+     *         resulting date/time would be invalid.
+     */
+    public void setMonth(int month){
+        if (!timeIsValid(this.year, month, this.day, this.hour, this.minute)){
+            throw new IllegalArgumentException("Invalid month value.");
+        }
+        this.month = month;
+    }
+
+    /**
+     * Sets the day after validating the resulting
+     * date and time.
+     *
+     * @param day Day value.
+     * @throws IllegalArgumentException if the
+     *         resulting date/time would be invalid.
+     */
+    public void setDay(int day){
+        if (!timeIsValid(this.year, this.month, day, this.hour, this.minute)){
+            throw new IllegalArgumentException("Invalid day value.");
+        }
+        this.day = day;
+    }
+
+    /**
+     * Sets the hour after validating the resulting
+     * date and time.
+     *
+     * @param hour Hour value.
+     * @throws IllegalArgumentException if the
+     *         resulting date/time would be invalid.
+     */
+    public void setHour(int hour){
+        if (!timeIsValid(this.year, this.month, this.day, hour, this.minute)){
+            throw new IllegalArgumentException("Invalid hour value.");
+        }
+        this.hour = hour;
+    }
+
+    /**
+     * Sets the minute after validating the resulting
+     * date and time.
+     *
+     * @param minute Minute value.
+     * @throws IllegalArgumentException if the
+     *         resulting date/time would be invalid.
+     */
+    public void setMinute(int minute){
+        if (!timeIsValid(this.year, this.month, this.day, this.hour, minute)){
+            throw new IllegalArgumentException("Invalid minute value.");
+        }
         this.minute = minute;
     }
 
@@ -123,7 +250,7 @@ public class Time {
             if(day > 30 || day < 1){
                  return false;
             }
-        } else if (day > 31 && day < 1){
+        } else if (day > 31 || day < 1){
             return false;
         }
         return true;
