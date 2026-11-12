@@ -1,5 +1,11 @@
 package dayplanner;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 /**
  * DayPlanner is a simple activity management
@@ -19,9 +25,7 @@ import java.util.Scanner;
 public class DayPlanner {
     public final static int MAX_ARRAY_LEN = 10; 
 
-    public static HomeActivity[] HomeActivities = new HomeActivity[MAX_ARRAY_LEN];
-    public static SchoolActivity[] SchoolActivities = new SchoolActivity[MAX_ARRAY_LEN];
-    public static OtherActivity[] OtherActivities = new OtherActivity[MAX_ARRAY_LEN];
+    private static ArrayList<Activity> activities = new ArrayList<Activity>();
     
     //Constants for the different activity type options in my code
     private static final int HOME = 1;
@@ -29,11 +33,12 @@ public class DayPlanner {
     private static final int OTHER = 3;
     private static final int ALL = 4;
 
-    public static int homeCount = 0;
-    public static int schoolCount = 0;
-    public static int otherCount = 0;
+    private static int homeCount = 0;
+    private static int schoolCount = 0;
+    private static int otherCount = 0;
 
-    public static Scanner inScanner = new Scanner(System.in);
+    private static Scanner inScanner = new Scanner(System.in);
+    private static String dataFile = "activities.txt";
 
     /**
      * Prompts the user for activity information and
@@ -73,7 +78,7 @@ public class DayPlanner {
         }
 
         //checks if time range is impossible
-        if( startTime.compareTo(endTime) > 0){
+        if( startTime.getTime() > endTime.getTime()){
             System.err.println("Error: Invalid start and end times.");
             return;
         }
@@ -83,12 +88,10 @@ public class DayPlanner {
 
         switch (activityType) {
             case HOME:
-                HomeActivities[homeCount] = new HomeActivity( title, startTime, endTime, comment);   
-                homeCount++;
+                activities.add(new HomeActivity( title, startTime, endTime, comment));   
                 break;
             case SCHOOL:
-                SchoolActivities[schoolCount] = new SchoolActivity( title, startTime, endTime, comment);
-                schoolCount++;
+                activities.add(new SchoolActivity( title, startTime, endTime, comment));
                 break;
             case OTHER:
                 System.out.println("Please enter a location: ");
@@ -97,8 +100,7 @@ public class DayPlanner {
                     System.err.println("Error: location is invalid");
                     return;
                 }
-                OtherActivities[otherCount] = new OtherActivity( title, startTime, endTime, comment, location);
-                otherCount++;
+                activities.add(new OtherActivity( title, startTime, endTime, comment, location));
                 break;
         }
     }
@@ -329,9 +331,160 @@ public class DayPlanner {
         }
     }
 
+    /**
+     * Loads activities from a text file.
+     * Each activity is a block of key = "value" lines,
+     * separated from the next activity by a blank line.
+     *
+     * @param filename File to read.
+     */
+    public static void loadActivities(String filename){
+        try{
+            FileInputStream fileInputStream = new FileInputStream(filename);
+            Scanner fileScanner = new Scanner(fileInputStream);
 
+            String type = null;
+            String title = null;
+            Time startTime = null;
+            Time endTime = null;
+            String comment = "";
+            String location = null;
+            boolean readingActivity = false;
+
+            while(fileScanner.hasNextLine()){
+                String line = fileScanner.nextLine();
+                if (line.isBlank()){
+                    if (readingActivity){
+                        addActivityFromFile(type, title, startTime, endTime, comment, location);   
+                        type = null;
+                        title = null;
+                        startTime = null;
+                        endTime = null;
+                        comment = "";
+                        location = null;
+                        readingActivity = false;
+                    }
+                    continue;
+                }
+
+                readingActivity = true;
+
+                String[] keyValue = line.split("=");
+                if (keyValue.length != 2){
+                    continue;
+                }
+                String key = keyValue[0].trim();
+                String value = stripQuotes(keyValue[1].trim());
+                switch (key){
+                    case "type":
+                        type = value;
+                        break;
+                    case "title":
+                        title = value;
+                        break;
+                    case "start":
+                        startTime = parseTime(value);
+                        break;
+                    case "end":
+                        endTime = parseTime(value);
+                        break;
+                    case "comment":
+                        comment = value;
+                        break;
+                    case "location":
+                        location = value;
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            if (readingActivity){
+                addActivityFromFile(type, title, startTime, endTime, comment, location);
+            }
+            fileScanner.close();
+        } catch(FileNotFoundException e){
+            System.err.println("Error: file does not exist");
+        }
+    }
+
+    /**
+     * Saves every activity to a text file.
+     * Home and school activities use type, title, start,
+     * end, and comment. Other activities also include location.
+     *
+     * @param filename File to write.
+     */
+    public static void saveActivities(String filename){
+        try{
+            FileOutputStream fileOutputStream = new FileOutputStream(filename);
+            PrintWriter fileWriter = new PrintWriter(fileOutputStream);
+            for(int i = 0; i < activities.size(); i++){
+                fileWriter.println(activities.get(i).toString());
+                if (i < activities.size() - 1){
+                    fileWriter.println();
+                }
+            }
+            fileWriter.close();
+        }
+        catch(FileNotFoundException e){
+            System.err.println("Error: file does not exist");
+        }
+    }
+
+    /**
+     * Adds one activity that was read from a file.
+     *
+     * @param type Activity type.
+     * @param title Activity title.
+     * @param startTime Activity start time.
+     * @param endTime Activity end time.
+     * @param comment Activity comment.
+     * @param location Activity location.
+     */
+    private static void addActivityFromFile(String type, String title, Time startTime, Time endTime, String comment, String location){
+        switch (type){
+            case "home":
+                activities.add(new HomeActivity(title, startTime, endTime, comment));
+                break;
+            case "school":
+                activities.add(new SchoolActivity(title, startTime, endTime, comment));
+                break;
+            case "other":
+                if (location == null || location.isEmpty()){
+                    System.err.println("Error: invalid activity in file");
+                    return;
+                }
+                activities.add(new OtherActivity(title, startTime, endTime, comment, location));
+                break;
+            default:
+                System.err.println("Error: invalid activity in file");
+                break;
+        }
+    }
+
+    /**
+     * Removes the surrounding quotes from a file value.
+     *
+     * @param value Value to strip quotes from.
+     * @return Value without surrounding quotes.
+     */
+    private static String stripQuotes(String value){
+        if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")){
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
+    }
 
     public static void main(String[] args) {
+        if(args.length > 0){
+            dataFile = args[0];
+        } else {
+            System.out.println("No filename provided, using default filename: activities.txt");
+        }
+        loadActivities(dataFile);
+
+
         boolean active = true;
         while(active == true){
             System.out.println("============================================================================\n" +
@@ -363,7 +516,7 @@ public class DayPlanner {
                                 System.err.println("Error: SchoolActivities is full.");
                                 break;
                             }
-                            addActivity(HOME);
+                            addActivity(SCHOOL);
                             break;
 
                         case "other":
@@ -411,6 +564,7 @@ public class DayPlanner {
                 case "q":
                     // intentional fall through
                 case "quit":
+                    saveActivities(dataFile);
                     active = false;
                     break;
                 default:

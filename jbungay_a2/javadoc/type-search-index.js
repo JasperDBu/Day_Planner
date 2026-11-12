@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"dayplanner","l":"Activity"},{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"dayplanner","l":"DayPlanner"},{"p":"dayplanner","l":"HomeActivity"},{"p":"dayplanner","l":"OtherActivity"},{"p":"dayplanner","l":"SchoolActivity"},{"p":"dayplanner","l":"Time"}];updateSearchResults();

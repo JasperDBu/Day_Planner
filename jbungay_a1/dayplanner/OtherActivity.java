@@ -11,56 +11,13 @@ package dayplanner;
  * @author Jasper Bungay
  * @version 1.0
  */
-public class OtherActivity {
+public class OtherActivity extends Activity {
     
-    private String title;
-    private Time startTime;
-    private Time endTime;
-    private String comment;
     private String location;
 
     public OtherActivity( String titleString, Time startTime, Time endTime, String commentString, String locationString){
-        title = titleString;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        comment = commentString;
+        super(titleString, startTime, endTime, commentString);
         location = locationString;
-    }
-
-    /**
-     * Retrieves the title of the activity.
-     *
-     * @return Activity title.
-     */
-    public String getTitle(){
-        return title;
-    }
-
-    /**
-     * Retrieves the start time of the activity.
-     *
-     * @return Activity start time.
-     */
-    public Time getStartTime(){
-        return startTime;
-    }
-    
-    /**
-     * Retrieves the end time of the activity.
-     *
-     * @return Activity end time.
-     */
-    public Time getEndTime(){
-        return endTime;
-    }
-
-    /**
-     * Retrieves the comment of the activity.
-     *
-     * @return Activity comment.
-     */
-    public String getComment(){
-        return comment;
     }
 
     /**
@@ -70,5 +27,35 @@ public class OtherActivity {
      */
     public String getLocation(){
         return location;
+    }
+
+    /**
+     * Sets the location of the activity.
+     *
+     * @param location Activity location.
+     */
+    public void setLocation(String location){
+        this.location = location;
+    }
+
+    /**
+     * Returns the file type for an other activity.
+     *
+     * @return "other".
+     */
+    @Override
+    public String getType(){
+        return "other";
+    }
+
+    /**
+     * Returns this activity in the data-file format,
+     * including its location.
+     *
+     * @return File lines for this activity.
+     */
+    @Override
+    public String toString(){
+        return super.toFileString() + "location = \"" + location + "\"\n";
     }
 }

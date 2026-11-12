@@ -1,0 +1,18 @@
+type = "home"
+title = "Work on Java Programming"
+start = "2026/9/10,17:30"
+end = "2026/9/10,19:00"
+comment = "With John Doe"
+
+type = "other"
+title = "Buy Programming in Java"
+start = "2026/9/12,9:00"
+end = "2026/9/12,10:00"
+comment = "Also buy stationery"
+location = "Indigo in Guelph"
+
+type = "school"
+title = "Java Lab"
+start = "2026/9/11,10:00"
+end = "2026/9/11,11:30"
+comment = "CIS2430"

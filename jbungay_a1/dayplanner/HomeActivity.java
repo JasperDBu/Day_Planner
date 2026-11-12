@@ -10,12 +10,7 @@ package dayplanner;
  * @author Jasper Bungay
  * @version 1.0
  */
-public class HomeActivity {
-
-    private String title;
-    private Time startTime;
-    private Time endTime;
-    private String comment;
+public class HomeActivity extends Activity {
 
     /**
      * Creates a HomeActivity object.
@@ -26,45 +21,16 @@ public class HomeActivity {
      * @param commentString Optional activity comment.
      */
     public HomeActivity( String titleString, Time startTime, Time endTime, String commentString){
-        title = titleString;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        comment = commentString;
+        super(titleString, startTime, endTime, commentString);
     }
 
     /**
-     * Retrieves the title of the activity.
+     * Returns the file type for a home activity.
      *
-     * @return Activity title.
+     * @return "home".
      */
-    public String getTitle(){
-        return title;
-    }
-
-    /**
-     * Retrieves the start time of the activity.
-     *
-     * @return Activity start time.
-     */
-    public Time getStartTime(){
-        return startTime;
-    }
-    
-    /**
-     * Retrieves the end time of the activity.
-     *
-     * @return Activity end time.
-     */
-    public Time getEndTime(){
-        return endTime;
-    }
-
-    /**
-     * Retrieves the comment of the activity.
-     *
-     * @return Activity comment.
-     */
-    public String getComment(){
-        return comment;
+    @Override
+    public String getType(){
+        return "home";
     }
 }
